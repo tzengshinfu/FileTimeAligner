@@ -4,21 +4,21 @@ using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using System.Reflection;
 using System.Windows.Forms.VisualStyles;
 
-var oFileInfo = ShellFile.FromFilePath("D:\\Users\\y1938\\Desktop\\IMG_0552.MOV");
+var fileInfo = ShellFile.FromFilePath("\\\\personalcloud.local\\Public\\miki_ipad\\相機膠捲\\IMG_0127.JPG");
 
 //Console.WriteLine($"FileName: {oFileInfo.Name}");
 
-var c = oFileInfo.Properties.DefaultPropertyCollection;
+var properties = fileInfo.Properties.DefaultPropertyCollection;
 //oFileInfo.Properties.GetProperty()
-foreach (var a in c)
+foreach (var property in properties)
 {
-    if (a.PropertyKey.FormatId == new Guid("46802c11-ada9-41b7-8ebe-65ba6699358b"))
+    if (property.PropertyKey.FormatId == new Guid("46802c11-ada9-41b7-8ebe-65ba6699358b"))
     {
-        Console.WriteLine($"{("Media_FormatCompliance")}=>{(a.ValueAsObject == null ? "無" : a.ValueAsObject.ToString())}");
+        Console.WriteLine($"{("Media_FormatCompliance")}=>{(property.ValueAsObject == null ? "無" : property.ValueAsObject.ToString())}");
     }
     else
     {
-        Console.WriteLine($"{(a.Description.DisplayName == null ? a.CanonicalName : a.Description.DisplayName)}=>{(a.ValueAsObject == null ? "無" : a.ValueAsObject.ToString())}");
+        Console.WriteLine($"{(property.Description.DisplayName == null ? property.CanonicalName : property.Description.DisplayName)}=>{(property.ValueAsObject == null ? "無" : property.ValueAsObject.ToString())}");
     }
 
 }
