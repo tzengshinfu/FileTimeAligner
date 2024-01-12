@@ -1,22 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileDateAligner", "FileDateAligner\FileDateAligner.csproj", "{3D62BF7B-480C-4F29-B4E6-5689EFE0F0CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileDateAligner", "FileDateAligner\FileDateAligner.csproj", "{8F3E8738-C914-471F-8D23-D7065E99053E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F3E8738-C914-471F-8D23-D7065E99053E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F3E8738-C914-471F-8D23-D7065E99053E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F3E8738-C914-471F-8D23-D7065E99053E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F3E8738-C914-471F-8D23-D7065E99053E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3D62BF7B-480C-4F29-B4E6-5689EFE0F0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D62BF7B-480C-4F29-B4E6-5689EFE0F0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D62BF7B-480C-4F29-B4E6-5689EFE0F0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D62BF7B-480C-4F29-B4E6-5689EFE0F0CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D782CD1B-0BE7-4D3B-A624-169FAE7AAAD7}
 	EndGlobalSection
 EndGlobal
