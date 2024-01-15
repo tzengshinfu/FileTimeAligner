@@ -5,7 +5,8 @@ using System.Reflection;
 using System.Windows.Forms.VisualStyles;
 
 //var fileInfo = ShellFile.FromFilePath("\\\\personalcloud.local\\Public\\miki_ipad\\相機膠捲\\IMG_0127.JPG");
-var fileInfo = ShellFile.FromFilePath("D:\\Users\\y1938\\Desktop\\gitignore.txt");
+var fileInfo = ShellFile.FromFilePath("\\\\usun-filesvr.usuntek.com\\TW-資訊系統部\\資訊系統部內共用分享\\03.個人文件\\y1938\\image_20240115_133546.png");
+//var fileInfo = ShellFile.FromFilePath("\\\\usun-filesvr.usuntek.com\\TW-資訊系統部\\資訊系統部內共用分享\\20220721-SmartIT會議.mp4");
 
 //Console.WriteLine($"FileName: {oFileInfo.Name}");
 
@@ -41,5 +42,9 @@ foreach (var property in properties)
         return property.ValueAsObject.ToString();
     })();
 
+    if (property.ValueType.ToString().Contains("System.DateTime")) {
+Console.WriteLine($"{"property.Description.DisplayName"}=>{property.Description.DisplayName}");
+Console.WriteLine($"{"property.CanonicalName"}=>{property.CanonicalName}");
     Console.WriteLine($"{key}=>{value}");
+    }
 }
