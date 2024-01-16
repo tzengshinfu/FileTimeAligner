@@ -2,11 +2,16 @@
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows.Forms.VisualStyles;
 
 //var fileInfo = ShellFile.FromFilePath("\\\\personalcloud.local\\Public\\miki_ipad\\相機膠捲\\IMG_0127.JPG");
-var fileInfo = ShellFile.FromFilePath("\\\\usun-filesvr.usuntek.com\\TW-資訊系統部\\資訊系統部內共用分享\\03.個人文件\\y1938\\image_20240115_133546.png");
+//var fileInfo = ShellFile.FromFilePath("\\\\usun-filesvr.usuntek.com\\TW-資訊系統部\\資訊系統部內共用分享\\03.個人文件\\y1938\\image_20240115_133546.png");
 //var fileInfo = ShellFile.FromFilePath("\\\\usun-filesvr.usuntek.com\\TW-資訊系統部\\資訊系統部內共用分享\\20220721-SmartIT會議.mp4");
+var fileInfo = ShellFile.FromFilePath("\\\\personalcloud.local\\Public\\Liu 的 iPad (001416616837)\\相機膠卷\\IMG_0260.MOV");
+var fileName = fileInfo.Name;
+var regex = new Regex("(\\d{4}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2})");
+
 
 //Console.WriteLine($"FileName: {oFileInfo.Name}");
 
@@ -46,5 +51,12 @@ foreach (var property in properties)
 Console.WriteLine($"{"property.Description.DisplayName"}=>{property.Description.DisplayName}");
 Console.WriteLine($"{"property.CanonicalName"}=>{property.CanonicalName}");
     Console.WriteLine($"{key}=>{value}");
+    //property.Description.DisplayName=>拍攝日期
+    //property.CanonicalName=>System.Photo.DateTaken
+    //拍攝日期=>2013/6/15 下午 06:34:12
+    //property.Description.DisplayName=>建立的媒體
+    //property.CanonicalName=>System.Media.DateEncoded
+    //建立的媒體=>2013/4/22 下午 06:04:33
+    //(\d{4}).{0,1}(\d{2}).{0,1}(\d{2}).{0,1}(\d{2}).{0,1}(\d{2}).{0,1}(\d{2})
     }
 }
