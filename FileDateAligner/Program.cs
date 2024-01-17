@@ -2,51 +2,52 @@
 using Microsoft.WindowsAPICodePack.Shell;
 using System.Text.RegularExpressions;
 
-Parser.Default.ParseArguments<Options>(args)
-                   .WithParsed(o =>
-                   {
-                       if (o.Verbose)
-                       {
-                           Console.WriteLine($"Verbose output enabled. Current Arguments: -v {o.Verbose}");
-                           Console.WriteLine("Quick Start Example! App is in Verbose mode!");
-                       }
-                       else
-                       {
-                           Console.WriteLine($"Current Arguments: -v {o.Verbose}");
-                           Console.WriteLine("Quick Start Example!");
-                       }
-                   });
-
-Directory.EnumerateFiles("D:\\Users\\y1938\\Documents\\Desktop", "*", SearchOption.AllDirectories).ToList().ForEach(filePath =>
+Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
 {
-    var mimeType = MimeMapping.MimeUtility.GetMimeMapping(filePath);
-    if (!new string[] { "image", "video", "audio" }.Contains(mimeType.Split("/")[0]))
+    Directory.EnumerateFiles(option.DirectoryPath, "*", option.AllDirectory ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList().ForEach(filePath =>
     {
-        return;
-    }
-
-    var fileInfo = ShellFile.FromFilePath(filePath);
-    // 降低修改時間精度到秒級
-    var lastWriteTime = DateTime.Parse(fileInfo.Properties.System.DateModified.Value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-    var dateFinder = new Regex("(\\d{4}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2})");
-    var findResult = dateFinder.Match(fileInfo.Name);
-    if (findResult.Success)
-    {
-        var fileTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
-        if (fileTime < lastWriteTime)
+        var mimeType = MimeMapping.MimeUtility.GetMimeMapping(filePath);
+        if (!new string[] { "image", "video", "audio" }.Contains(mimeType.Split("/")[0]))
         {
-            File.SetLastWriteTime(fileInfo.Path, fileTime);
+            return;
         }
+
+        var fileInfo = ShellFile.FromFilePath(filePath);
+        // 降低修改時間精度到秒級
+        var lastWriteTime = DateTime.Parse(fileInfo.Properties.System.DateModified.Value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+        var dateFinder = new Regex("(\\d{4}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2})");
+        var findResult = dateFinder.Match(fileInfo.Name);
+        if (findResult.Success)
+        {
+            var fileTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
+            if (fileTime < lastWriteTime)
+            {
+                File.SetLastWriteTime(fileInfo.Path, fileTime);
+            }
+        }
+        else
+        {
+            var mediaTime = GetMediaTime(fileInfo, ["System.Photo.DateTaken", "System.Media.DateEncoded"]);
+            if (mediaTime < lastWriteTime && mediaTime > DateTime.Parse("2000/01/01"))
+            {
+                File.SetLastWriteTime(fileInfo.Path, mediaTime);
+            }
+        }
+    });
+
+    if (option.AllDirectory)
+    {
+        Console.WriteLine($"Verbose output enabled. Current Arguments: -v {option.AllDirectory}");
+        Console.WriteLine("Quick Start Example! App is in Verbose mode!");
     }
     else
     {
-        var mediaTime = GetMediaTime(fileInfo, ["System.Photo.DateTaken", "System.Media.DateEncoded"]);
-        if (mediaTime < lastWriteTime && mediaTime > DateTime.Parse("2000/01/01"))
-        {
-            File.SetLastWriteTime(fileInfo.Path, mediaTime);
-        }
+        Console.WriteLine($"Current Arguments: -v {option.AllDirectory}");
+        Console.WriteLine("Quick Start Example!");
     }
 });
+
+
 
 static DateTime GetMediaTime(ShellFile fileInfo, string[] propertyKeys)
 {
@@ -70,6 +71,21 @@ static DateTime GetMediaTime(ShellFile fileInfo, string[] propertyKeys)
 
 public class Options
 {
-    [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
-    public bool Verbose { get; set; }
+    [Option('a', "all-directory", Required = false, HelpText = "掃瞄子目錄", Default = false)]
+    public bool AllDirectory { get; set; }
+
+    [Option('m', "minimum-date", Required = false, HelpText = "忽略小於此日期的屬性值", Default = "2000/01/01")]
+    public string? MinimumDate { get; set; }
+
+    [Option('p', "property-keys", Required = false, HelpText = "屬性值名稱，以分號區隔，預設為：System.Photo.DateTaken;System.Media.DateEncoded", Default = "System.Photo.DateTaken;System.Media.DateEncoded")]
+    public string? PropertyKeys { get; set; }
+
+    [Option('f', "file-name", Required = false, HelpText = "檔名符合時間格式優先取代屬性值", Default = true)]
+    public bool FileName { get; set; }
+
+    [Option('t', "mime-type", Required = false, HelpText = "MIME類型，預設為：image;video", Default = "image;video")]
+    public string? MimeType { get; set; }
+
+    [Value(0, MetaName = "input file", HelpText = "Input file to be processed.", Required = true)]
+    public required string DirectoryPath { get; set; }
 }

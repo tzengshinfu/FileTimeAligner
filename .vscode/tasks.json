@@ -3,8 +3,8 @@
 	"tasks": [
         {
             "type": "dotnet",
-            "task": "build d:\\Users\\y1938\\Workspace\\FileDateAligner\\FileDateAligner\\FileDateAligner.csproj",
-            "file": "d:\\Users\\y1938\\Workspace\\FileDateAligner\\FileDateAligner\\FileDateAligner.csproj",
+            "task": "build D:\\Users\\tzeng\\tzengshinfu-WorkSpace\\Developing\\FileDateAligner\\FileDateAligner\\FileDateAligner.csproj",
+            "file": "D:\\Users\\tzeng\\tzengshinfu-WorkSpace\\Developing\\FileDateAligner\\FileDateAligner\\FileDateAligner.csproj",
             "group": "build",
             "problemMatcher": [],
             "label": "dotnet: build"
