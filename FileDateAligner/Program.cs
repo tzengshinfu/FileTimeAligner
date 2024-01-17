@@ -32,7 +32,7 @@ Directory.EnumerateFiles("D:\\Users\\y1938\\Documents\\Desktop", "*", SearchOpti
     }
 });
 
-static DateTime GetMediaTime(ShellFile fileInfo, String[] propertyKeys)
+static DateTime GetMediaTime(ShellFile fileInfo, string[] propertyKeys)
 {
     var times = new List<DateTime> { DateTime.MaxValue };
     var properties = fileInfo.Properties.DefaultPropertyCollection;
