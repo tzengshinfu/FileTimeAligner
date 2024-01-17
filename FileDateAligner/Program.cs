@@ -1,5 +1,21 @@
-﻿using Microsoft.WindowsAPICodePack.Shell;
+﻿using CommandLine;
+using Microsoft.WindowsAPICodePack.Shell;
 using System.Text.RegularExpressions;
+
+Parser.Default.ParseArguments<Options>(args)
+                   .WithParsed(o =>
+                   {
+                       if (o.Verbose)
+                       {
+                           Console.WriteLine($"Verbose output enabled. Current Arguments: -v {o.Verbose}");
+                           Console.WriteLine("Quick Start Example! App is in Verbose mode!");
+                       }
+                       else
+                       {
+                           Console.WriteLine($"Current Arguments: -v {o.Verbose}");
+                           Console.WriteLine("Quick Start Example!");
+                       }
+                   });
 
 Directory.EnumerateFiles("D:\\Users\\y1938\\Documents\\Desktop", "*", SearchOption.AllDirectories).ToList().ForEach(filePath =>
 {
@@ -50,4 +66,10 @@ static DateTime GetMediaTime(ShellFile fileInfo, string[] propertyKeys)
 
     var mediaTime = times.Min();
     return mediaTime;
+}
+
+public class Options
+{
+    [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages.")]
+    public bool Verbose { get; set; }
 }
