@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
+    <PackageReference Include="MimeMapping" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

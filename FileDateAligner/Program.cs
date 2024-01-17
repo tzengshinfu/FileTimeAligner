@@ -1,27 +1,36 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using System.Text.RegularExpressions;
 
-var fileInfo = ShellFile.FromFilePath("D:\\Users\\y1938\\Documents\\Desktop\\IMG_0127.JPG");
-var lastWriteTime = File.GetLastWriteTime(fileInfo.Path);
+Directory.EnumerateFiles("D:\\Users\\y1938\\Documents\\Desktop", "*", SearchOption.AllDirectories).ToList().ForEach(filePath =>
+{
+    var mimeType = MimeMapping.MimeUtility.GetMimeMapping(filePath);
+    if (!new string[] { "image", "video", "audio" }.Contains(mimeType.Split("/")[0]))
+    {
+        return;
+    }
 
-var dateFinder = new Regex("(\\d{4}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2})");
-var findResult = dateFinder.Match(fileInfo.Name);
-if (findResult.Success)
-{
-    var fileTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
-    if (fileTime < lastWriteTime)
+    var fileInfo = ShellFile.FromFilePath(filePath);
+    // 降低修改時間精度到秒級
+    var lastWriteTime = DateTime.Parse(fileInfo.Properties.System.DateModified.Value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+    var dateFinder = new Regex("(\\d{4}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2})");
+    var findResult = dateFinder.Match(fileInfo.Name);
+    if (findResult.Success)
     {
-        File.SetLastWriteTime(fileInfo.Path, fileTime);
+        var fileTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
+        if (fileTime < lastWriteTime)
+        {
+            File.SetLastWriteTime(fileInfo.Path, fileTime);
+        }
     }
-}
-else
-{
-    var mediaTime = GetMediaTime(fileInfo, ["System.Photo.DateTaken", "System.Media.DateEncoded"]);
-    if (mediaTime < lastWriteTime && mediaTime > DateTime.Parse("2000/01/01"))
+    else
     {
-        File.SetLastWriteTime(fileInfo.Path, mediaTime);
+        var mediaTime = GetMediaTime(fileInfo, ["System.Photo.DateTaken", "System.Media.DateEncoded"]);
+        if (mediaTime < lastWriteTime && mediaTime > DateTime.Parse("2000/01/01"))
+        {
+            File.SetLastWriteTime(fileInfo.Path, mediaTime);
+        }
     }
-}
+});
 
 static DateTime GetMediaTime(ShellFile fileInfo, String[] propertyKeys)
 {
