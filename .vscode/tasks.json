@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "FileTimeAligner/FileTimeAligner.csproj", // removed ${workspaceFolder}/
+                "FileTimeAligner.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
