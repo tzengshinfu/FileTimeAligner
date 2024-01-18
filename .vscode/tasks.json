@@ -2,12 +2,16 @@
 	"version": "2.0.0",
 	"tasks": [
         {
-            "type": "dotnet",
-            "task": "build D:\\Users\\tzeng\\tzengshinfu-WorkSpace\\Developing\\FileDateAligner\\FileDateAligner\\FileDateAligner.csproj",
-            "file": "D:\\Users\\tzeng\\tzengshinfu-WorkSpace\\Developing\\FileDateAligner\\FileDateAligner\\FileDateAligner.csproj",
-            "group": "build",
-            "problemMatcher": [],
-            "label": "dotnet: build"
+            "label": "dotnet: build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "FileTimeAligner/FileTimeAligner.csproj", // removed ${workspaceFolder}/
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

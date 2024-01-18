@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "dotnet: build",
             "program": "${workspaceFolder}/${workspaceFolderBasename}/bin/Debug/net8.0-windows/${workspaceFolderBasename}.dll",
-            "args": ["-a", "-m", "path"],
+            "args": ["D:\\Desktop", "-a", "-f", "-m", "2000/01/01"],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "internalConsole"
