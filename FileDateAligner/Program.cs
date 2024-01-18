@@ -74,18 +74,18 @@ public class Options
     [Option('a', "all-directory", Required = false, HelpText = "掃瞄子目錄", Default = false)]
     public bool AllDirectory { get; set; }
 
-    [Option('m', "minimum-date", Required = false, HelpText = "忽略小於此日期的屬性值", Default = "2000/01/01")]
+    [Option('m', "minimum-date", Required = false, HelpText = "忽略小於此日期的時間屬性值", Default = "2000/01/01")]
     public string? MinimumDate { get; set; }
 
-    [Option('p', "property-keys", Required = false, HelpText = "屬性值名稱，以分號區隔，預設為：System.Photo.DateTaken;System.Media.DateEncoded", Default = "System.Photo.DateTaken;System.Media.DateEncoded")]
+    [Option('p', "property-keys", Required = false, HelpText = "屬性值名稱，以分號區隔", Default = "System.Photo.DateTaken;System.Media.DateEncoded")]
     public string? PropertyKeys { get; set; }
 
     [Option('f', "file-name", Required = false, HelpText = "檔名符合時間格式優先取代屬性值", Default = true)]
     public bool FileName { get; set; }
 
-    [Option('t', "mime-type", Required = false, HelpText = "MIME類型，預設為：image;video", Default = "image;video")]
+    [Option('t', "mime-type", Required = false, HelpText = "MIME類型", Default = "image;video")]
     public string? MimeType { get; set; }
 
-    [Value(0, MetaName = "input file", HelpText = "Input file to be processed.", Required = true)]
+    [Value(0, MetaName = "directory path", HelpText = "要進行對齊的目錄路徑", Required = true)]
     public required string DirectoryPath { get; set; }
 }
