@@ -20,7 +20,7 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
         if (option.FileName && findResult.Success)
         {
             var fileTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
-            if (fileTime != lastWriteTime && fileTime > DateTime.Parse(option.MinimumDate))
+            if (fileTime < lastWriteTime && fileTime > DateTime.Parse(option.MinimumDate))
             {
                 File.SetLastWriteTime(fileInfo.Path, fileTime);
                 return;
@@ -28,7 +28,7 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
         }
 
         var mediaTime = GetMediaTime(fileInfo, option.PropertyKeys.Split(";"));
-        if (mediaTime != lastWriteTime && mediaTime > DateTime.Parse(option.MinimumDate))
+        if (mediaTime < lastWriteTime && mediaTime > DateTime.Parse(option.MinimumDate))
         {
             File.SetLastWriteTime(fileInfo.Path, mediaTime);
             return;
