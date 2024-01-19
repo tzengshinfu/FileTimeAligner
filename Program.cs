@@ -4,6 +4,10 @@ using System.Text.RegularExpressions;
 
 Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
 {
+    var now = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+    using var logWriter = File.CreateText($"FileTimeAligner-{now}.log");
+    logWriter.WriteLine("FilePath\tLastWriteTime\tAlignFrom\tAlignTime");
+
     Directory.EnumerateFiles(option.DirectoryPath, "*", option.AllDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList().ForEach(filePath =>
     {
         var mimeType = MimeMapping.MimeUtility.GetMimeMapping(filePath);
@@ -19,40 +23,45 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
         var findResult = dateFinder.Match(fileInfo.Name);
         if (option.FileName && findResult.Success)
         {
-            var fileTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
-            if (fileTime < lastWriteTime && fileTime > DateTime.Parse(option.MinimumDate))
+            var fileNameTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
+            if (fileNameTime < lastWriteTime && fileNameTime >= DateTime.Parse(option.MinimumDate))
             {
-                File.SetLastWriteTime(fileInfo.Path, fileTime);
+                File.SetLastWriteTime(fileInfo.Path, fileNameTime);
+                logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tFileName\t{fileNameTime.ToString("yyyy-MM-dd HH:mm:ss")}");
                 return;
             }
         }
 
-        var mediaTime = GetMediaTime(fileInfo, option.PropertyKeys.Split(";"));
-        if (mediaTime < lastWriteTime && mediaTime > DateTime.Parse(option.MinimumDate))
+        var mediaPropertyTime = GetMediaPropertyTime(fileInfo, option.PropertyKeys.Split(";"), option.MinimumDate);
+        if (mediaPropertyTime.Value < lastWriteTime)
         {
-            File.SetLastWriteTime(fileInfo.Path, mediaTime);
+            File.SetLastWriteTime(fileInfo.Path, mediaPropertyTime.Value);
+            logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\t{mediaPropertyTime.Key}\t{mediaPropertyTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}");
             return;
         }
+
+        logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tNone\tNone");
     });
 });
 
-static DateTime GetMediaTime(ShellFile fileInfo, string[] propertyKeys)
+static KeyValuePair<string, DateTime> GetMediaPropertyTime(ShellFile fileInfo, string[] propertyKeys, string minimumDate)
 {
-    var times = new List<DateTime> { DateTime.MaxValue };
+    var propertyTimes = new Dictionary<string, DateTime> { };
     var properties = fileInfo.Properties.DefaultPropertyCollection;
-
     foreach (var propertyKey in propertyKeys)
     {
-        var time = DateTime.MaxValue;
         var timeProperty = properties.Where(p => p.CanonicalName == propertyKey).SingleOrDefault();
         if (timeProperty != null && timeProperty.ValueAsObject != null)
         {
-            time = DateTime.Parse(timeProperty.ValueAsObject.ToString());
-            times.Add(time);
+            var time = DateTime.Parse(timeProperty.ValueAsObject.ToString());
+            if (time >= DateTime.Parse(minimumDate))
+            {
+                propertyTimes.Add(propertyKey, time);
+            }
         }
     }
 
-    var mediaTime = times.Min();
+    var mediaTime = propertyTimes.Count > 0 ? propertyTimes.MinBy(t => t.Value) : new KeyValuePair<string, DateTime>("NoPropertyKey", DateTime.MaxValue);
     return mediaTime;
 }
 
