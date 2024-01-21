@@ -10,37 +10,46 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
 
     Directory.EnumerateFiles(option.DirectoryPath, "*", option.AllDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList().ForEach(filePath =>
     {
-        var mimeType = MimeMapping.MimeUtility.GetMimeMapping(filePath);
-        if (!option.MimeType.Split(";").Contains(mimeType.Split("/")[0]))
+        try
         {
-            return;
-        }
-
-        var fileInfo = ShellFile.FromFilePath(filePath);
-        // 降低修改時間精度到秒級
-        var lastWriteTime = DateTime.Parse(fileInfo.Properties.System.DateModified.Value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-        var dateFinder = new Regex("(\\d{4}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2})");
-        var findResult = dateFinder.Match(fileInfo.Name);
-        if (option.FileName && findResult.Success)
-        {
-            var fileNameTime = DateTime.Parse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value);
-            if (fileNameTime < lastWriteTime && fileNameTime >= DateTime.Parse(option.MinimumDate))
+            var mimeType = MimeMapping.MimeUtility.GetMimeMapping(filePath);
+            if (!option.MimeType.Split(";").Contains(mimeType.Split("/")[0]))
             {
-                File.SetLastWriteTime(fileInfo.Path, fileNameTime);
-                logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tFileName\t{fileNameTime.ToString("yyyy-MM-dd HH:mm:ss")}");
                 return;
             }
-        }
 
-        var mediaPropertyTime = GetMediaPropertyTime(fileInfo, option.PropertyKeys.Split(";"), option.MinimumDate);
-        if (mediaPropertyTime.Value < lastWriteTime)
+            var fileInfo = ShellFile.FromFilePath(filePath);
+            // 降低修改時間精度到秒級
+            var lastWriteTime = DateTime.Parse(fileInfo.Properties.System.DateModified.Value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            var dateFinder = new Regex("(\\d{4})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})");
+            var findResult = dateFinder.Match(fileInfo.Name);
+            if (option.FileName && findResult.Success)
+            {
+                if (DateTime.TryParse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value, out DateTime fileNameTime))
+                {
+                    if (fileNameTime < lastWriteTime && fileNameTime >= DateTime.Parse(option.MinimumDate))
+                    {
+                        File.SetLastWriteTime(fileInfo.Path, fileNameTime);
+                        logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tFileName\t{fileNameTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+                        return;
+                    }
+                }
+            }
+
+            var mediaPropertyTime = GetMediaPropertyTime(fileInfo, option.PropertyKeys.Split(";"), option.MinimumDate);
+            if (mediaPropertyTime.Value < lastWriteTime)
+            {
+                File.SetLastWriteTime(fileInfo.Path, mediaPropertyTime.Value);
+                logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\t{mediaPropertyTime.Key}\t{mediaPropertyTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}");
+                return;
+            }
+
+            logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tNone\tNone");
+        }
+        catch (Exception ex)
         {
-            File.SetLastWriteTime(fileInfo.Path, mediaPropertyTime.Value);
-            logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\t{mediaPropertyTime.Key}\t{mediaPropertyTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}");
-            return;
+            logWriter.WriteLine($"{filePath}\t{ex.Message}\tNone\tNone");
         }
-
-        logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tNone\tNone");
     });
 });
 

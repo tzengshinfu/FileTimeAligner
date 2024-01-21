@@ -9,8 +9,8 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "dotnet: build",
-            "program": "${workspaceFolder}/bin/Debug/net8.0-windows/${workspaceFolderBasename}.dll",
-            "args": ["D:\\Desktop", "-a", "-f", "-m", "2000/01/01"],
+            "program": "${workspaceFolder}/bin/Debug/net8.0-windows/win-x64/${workspaceFolderBasename}.dll",
+            "args": ["D:\\Pictures\\MI 2S (c46ab7bfa110)", "-a", "-f", "-m", "2000/01/01"],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "internalConsole"
