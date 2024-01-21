@@ -19,7 +19,7 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
         var fileInfo = ShellFile.FromFilePath(filePath);
         // 降低修改時間精度到秒級
         var lastWriteTime = DateTime.Parse(fileInfo.Properties.System.DateModified.Value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-        var dateFinder = new Regex("(\\d{4}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2}).{0,1}(\\d{2})");
+        var dateFinder = new Regex("(\\d{4})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})");
         var findResult = dateFinder.Match(fileInfo.Name);
         if (option.FileName && findResult.Success)
         {
