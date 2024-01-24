@@ -6,7 +6,7 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
 {
     var now = DateTime.Now.ToString("yyyyMMdd_HHmmss");
     using var logWriter = File.CreateText($"FileTimeAligner-{now}.log");
-    logWriter.WriteLine("FilePath\tLastWriteTime\tAlignFrom\tAlignTime");
+    logWriter.WriteLine("FilePath\tLastWriteTime\tAlignFrom\tAlignTime\tResult\tMessage");
 
     Directory.EnumerateFiles(option.DirectoryPath, "*", option.AllDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList().ForEach(filePath =>
     {
@@ -30,7 +30,7 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
                     if (fileNameTime < lastWriteTime && fileNameTime >= DateTime.Parse(option.MinimumDate))
                     {
                         File.SetLastWriteTime(fileInfo.Path, fileNameTime);
-                        logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tFileName\t{fileNameTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+                        logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tFileName\t{fileNameTime.ToString("yyyy-MM-dd HH:mm:ss")}\tSuccess\t");
                         return;
                     }
                 }
@@ -40,15 +40,15 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
             if (mediaPropertyTime.Value < lastWriteTime)
             {
                 File.SetLastWriteTime(fileInfo.Path, mediaPropertyTime.Value);
-                logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\t{mediaPropertyTime.Key}\t{mediaPropertyTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}");
+                logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\t{mediaPropertyTime.Key}\t{mediaPropertyTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}\tSuccess\t");
                 return;
             }
 
-            logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tNone\tNone");
+            logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tNone\tNone\tNone\t");
         }
         catch (Exception ex)
         {
-            logWriter.WriteLine($"{filePath}\t{ex.Message}\tNone\tNone");
+            logWriter.WriteLine($"{filePath}\tNone\tNone\tNone\tFail\t{ex.Message}");
         }
     });
 });
