@@ -21,11 +21,11 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
             var fileInfo = ShellFile.FromFilePath(filePath);
             // 降低修改時間精度到秒級
             var lastWriteTime = DateTime.Parse(fileInfo.Properties.System.DateModified.Value.Value.ToString("yyyy-MM-dd HH:mm:ss"));
-            var dateFinder = new Regex("(\\d{4})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})");
-            var findResult = dateFinder.Match(fileInfo.Name);
-            if (option.FileName && findResult.Success)
+            var fileNameTimeFinder = new Regex("(\\d{4})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})\\D{0,1}(\\d{2})");
+            var fileNameTimeFindResult = fileNameTimeFinder.Match(fileInfo.Name);
+            if (option.FileName && fileNameTimeFindResult.Success)
             {
-                if (DateTime.TryParse(findResult.Groups[1].Value + "/" + findResult.Groups[2].Value + "/" + findResult.Groups[3].Value + " " + findResult.Groups[4].Value + ":" + findResult.Groups[5].Value + ":" + findResult.Groups[6].Value, out DateTime fileNameTime))
+                if (DateTime.TryParse(fileNameTimeFindResult.Groups[1].Value + "/" + fileNameTimeFindResult.Groups[2].Value + "/" + fileNameTimeFindResult.Groups[3].Value + " " + fileNameTimeFindResult.Groups[4].Value + ":" + fileNameTimeFindResult.Groups[5].Value + ":" + fileNameTimeFindResult.Groups[6].Value, out DateTime fileNameTime))
                 {
                     if (fileNameTime < lastWriteTime && fileNameTime >= DateTime.Parse(option.MinimumDate))
                     {
@@ -33,6 +33,19 @@ Parser.Default.ParseArguments<Options>(args).WithParsed(option =>
                         logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tFileName\t{fileNameTime.ToString("yyyy-MM-dd HH:mm:ss")}\tSuccess\t");
                         return;
                     }
+                }
+            }
+
+            var unixTimestampFinder = new Regex("(\\d{10})(\\d{3})?");
+            var unixTimestampFindResult = unixTimestampFinder.Match(fileInfo.Name);
+            if (option.FileName && unixTimestampFindResult.Success)
+            {
+                var fileNameTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(double.Parse(unixTimestampFindResult.Groups[1].Value)).ToLocalTime();
+                if (fileNameTime < lastWriteTime && fileNameTime >= DateTime.Parse(option.MinimumDate))
+                {
+                    File.SetLastWriteTime(fileInfo.Path, fileNameTime);
+                    logWriter.WriteLine($"{filePath}\t{lastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")}\tFileName\t{fileNameTime.ToString("yyyy-MM-dd HH:mm:ss")}\tSuccess\t");
+                    return;
                 }
             }
 

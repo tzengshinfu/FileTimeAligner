@@ -13,5 +13,5 @@
 | -a, --all-directories | (選填)掃瞄子目錄                                                                                    |
 | -t, --mime-type       | (選填)要對齊的檔案MIME類型，以分號區隔；預設為image;video                                           |
 | -p, --property-keys   | (選填)作為對齊來源的時間屬性名稱，以分號區隔；預設為System.Photo.DateTaken;System.Media.DateEncoded |
-| -f, --file-name       | (選填)檔案名稱若符合時間格式(yyyyMMddHHmmss)則優先使用                                              |
+| -f, --file-name       | (選填)檔案名稱若符合時間格式(yyyyMMddHHmmss)則優先使用，如果不符合時間格式再判斷是否符合UNIX時間(10位數字或13位數字)                                              |
 | -m, --minimum-date    | (選填)忽略小於此日期的時間屬性值；預設為1970/01/01                                                  |
